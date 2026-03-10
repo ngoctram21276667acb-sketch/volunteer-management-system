@@ -17,8 +17,9 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 
+/* CORS CONFIG */
 const corsOptions = {
-  origin: true,
+  origin: "https://volunteer-management-system-gq3q589be.vercel.app",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
