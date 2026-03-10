@@ -105,7 +105,6 @@ setInterval(checkAndSendReminders, REMINDER_INTERVAL);
 // Chạy lần đầu ngay khi server khởi động
 checkAndSendReminders();
 
-
-httpServer.listen(port, hostname, () => {
-  console.log(`Server running http://${hostname}:${port}`);
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
