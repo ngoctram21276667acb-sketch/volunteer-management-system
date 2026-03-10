@@ -1,19 +1,24 @@
 {
-  "name": "backend",
+  "name": "volunteer-management-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Volunteer Management System Backend",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node server.js"
   },
-  "keywords": [],
+  "keywords": [
+    "volunteer",
+    "management",
+    "nodejs",
+    "express",
+    "socketio"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1",
+    "express": "^4.19.2",
     "jsonwebtoken": "^9.0.3",
     "socket.io": "^4.8.3"
   }
