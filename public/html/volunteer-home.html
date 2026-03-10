@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ Tình nguyện viên</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-50">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-4">
+            <div class="flex items-center gap-2 min-w-max">
+                <i class="fa-solid fa-hand-holding-heart text-indigo-600 text-2xl"></i>
+                <span class="font-bold text-xl">Volunteer Matching</span>
+            </div>
+
+            <div class="relative w-full max-w-2xl mx-auto">
+                <input id="search-input" type="text" placeholder="Tìm kiếm chiến dịch, kỹ năng (Python, Canva...)"
+                    class="w-full pl-12 pr-4 py-2.5 rounded-full border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="volunteer-applications.html" class="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition" title="Quản lý ứng tuyển">
+                    <i class="fa-solid fa-list-check text-xl"></i>
+                    <span class="hidden md:inline text-sm font-semibold">Ứng tuyển của tôi</span>
+                </a>
+                <div class="relative">
+                    <button id="notif-btn" class="focus:outline-none">
+                        <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer"></i>
+                        <span id="notif-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                    </button>
+                    <!-- Notification Popup -->
+                    <div id="notif-popup" class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 hidden z-50">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">Thông báo</h3>
+                            <button id="clear-notif" class="text-xs text-indigo-600 hover:underline">Xóa tất cả</button>
+                        </div>
+                        <div id="notif-list" class="max-h-96 overflow-y-auto p-2 space-y-2">
+                            <p class="text-center text-gray-400 py-4 text-sm">Không có thông báo mới</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="chat.html" class="relative">
+                    <i class="fa-regular fa-comments text-xl text-gray-600 cursor-pointer"></i>
+                    <span id="chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+
+
+                <div id="user-avatar"
+                onclick="openProfile()"
+                class="hidden cursor-pointer w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600 text-sm"
+                title="">
+                TN
+                </div>           
+                <a id="btn-login" href="/login" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700">Đăng nhập</a>
+                <button id="logout-btn" onclick="logout()"
+                    class="hidden bg-red-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-red-600">
+                    Đăng xuất
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <section class="mb-12">
+            <div class="relative rounded-3xl overflow-hidden h-64 md:h-80 bg-indigo-900 flex items-center px-12">
+                <div class="z-10 max-w-lg text-white">
+                    <span
+                        class="bg-red-500 text-xs font-bold px-3 py-1 rounded-full uppercase mb-4 inline-block italic">Khẩn
+                        cấp</span>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Chiến dịch Cứu trợ miền Trung</h2>
+                    <p class="text-indigo-100 mb-6">Cần 20 tình nguyện viên hỗ trợ điều phối nhu yếu phẩm tại Quảng
+                        Bình.</p>
+                    <button onclick="document.getElementById('campaign-list').scrollIntoView({ behavior: 'smooth' })" class="bg-white text-indigo-600 px-6 py-2.5 rounded-lg font-bold hover:bg-gray-100">Tham gia
+                        ngay</button>
+                </div>
+                <div
+                    class="absolute right-0 top-0 w-1/2 h-full opacity-40 bg-[url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover">
+                </div>
+            </div>
+        </section>
+
+        <section id="campaign-list" class="mb-12">
+            <h3 class="text-xl font-bold mb-6">Khám phá theo lĩnh vực</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div data-category="All"
+                    class="category-card bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:border-indigo-500 cursor-pointer transition">
+                    <i class="fa-solid fa-hand-holding-heart text-indigo-600 text-2xl mb-2"></i>
+                    <span class="font-medium">Tất cả</span>
+                </div>          
+                <div data-category="Education"
+                    class="category-card bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:border-indigo-500 cursor-pointer transition">
+                    <i class="fa-solid fa-book-open text-blue-500 text-2xl mb-2"></i>
+                    <span class="font-medium">Giáo dục</span>
+                </div>
+
+                <div data-category="Environment"
+                    class="category-card bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:border-green-500 cursor-pointer transition">
+                    <i class="fa-solid fa-leaf text-green-500 text-2xl mb-2"></i>
+                    <span class="font-medium">Môi trường</span>
+                </div>
+
+                <div data-category="Technology"
+                    class="category-card bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:border-purple-500 cursor-pointer transition">
+                    <i class="fa-solid fa-microchip text-purple-500 text-2xl mb-2"></i>
+                    <span class="font-medium">Công nghệ</span>
+                </div>
+
+                <div data-category="Healthcare"
+                    class="category-card bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:border-red-500 cursor-pointer transition">
+                    <i class="fa-solid fa-heart-pulse text-red-500 text-2xl mb-2"></i>
+                    <span class="font-medium">Y tế</span>
+                </div>
+            </div>
+            <div class="h-5"></div>
+            <!-- Render list -->
+            <!-- ALL CAMPAIGNS -->
+            <div>
+                <!-- <h3 class="text-xl font-bold mb-4">Tất cả chiến dịch</h3> -->
+                <div id="all-list" class="grid md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Education -->
+            <div>
+                <!-- <h3 class="text-xl font-bold mb-4">Giáo dục</h3> -->
+                <div id="education-list" class="grid md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Environment -->
+            <div>
+                <!-- <h3 class="text-xl font-bold mb-4">Môi trường</h3> -->
+                <div id="environment-list" class="grid md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Technology -->
+            <div>
+                <!-- <h3 class="text-xl font-bold mb-4">Công nghệ</h3> -->
+                <div id="technology-list" class="grid md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Healthcare -->
+            <div>
+                <!-- <h3 class="text-xl font-bold mb-4">Y tế</h3> -->
+                <div id="healthcare-list" class="grid md:grid-cols-3 gap-6"></div>
+            </div>
+        </section>
+
+
+
+
+
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Gợi ý dựa trên kỹ năng của bạn</h3>
+                <span class="text-indigo-600 text-sm font-semibold cursor-pointer">Xem tất cả</span>
+            </div>
+            <div class="h-5">  
+            </div>
+            <div id="skill-recommend-list" class="grid md:grid-cols-3 gap-6"></div>
+        </section>
+    </main>
+    
+
+    
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+
+    const API_BASE = "http://127.0.0.1:3000/api/v1/org";
+    let allCampaigns = []
+    let currentCategory = null
+
+    async function apiFetch(path, options = {}) {
+
+        const res = await fetch(API_BASE + path, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) {
+            throw new Error(data.message || "API error")
+        }
+
+        return data.data
+    }
+    const USER_STORAGE_KEY = "sessionKey"
+    const PLACEHOLDER_IMG =
+    "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
+
+        function getLoggedInUser() {
+        try {
+            const raw = sessionStorage.getItem(USER_STORAGE_KEY);
+            if (!raw) return null;
+            const u = JSON.parse(raw);
+            return u && u.token ? u : null;
+        } catch (_) { return null; }
+    }
+
+    function initSocket() {
+      const session = getLoggedInUser();
+      if (!session || !session.token) return;
+
+      const socket = io("http://127.0.0.1:3000", {
+        auth: { token: session.token },
+      });
+
+      socket.on("connect", () => {
+        console.log("Socket connected on volunteer homepage.");
+      });
+
+      socket.on("notification:receive", (notification) => {
+        console.log("New notification:", notification);
+        // Thay vì alert, ta cập nhật vào list và badge
+        addNotificationToList(notification);
+        updateNotifBadge(1);
+      });
+    }
+
+    function addNotificationToList(notif) {
+      const listEl = document.getElementById('notif-list');
+      // Nếu là thông báo đầu tiên, xóa chữ "Không có thông báo mới"
+      if (listEl.querySelector('p.text-center')) {
+        listEl.innerHTML = '';
+      }
+
+      const item = document.createElement('div');
+      item.className = "p-3 hover:bg-gray-50 rounded-lg border-b border-gray-100 last:border-0 cursor-pointer transition";
+      item.innerHTML = `
+        <p class="text-sm text-gray-800">${notif.message}</p>
+        <span class="text-[10px] text-gray-400 mt-1 block">${new Date(notif.createdAt).toLocaleString('vi-VN')}</span>
+      `;
+      item.onclick = () => {
+        if (notif.link && notif.link !== '#') window.location.href = notif.link;
+      };
+      listEl.prepend(item);
+    }
+
+    function updateNotifBadge(count) {
+      const badge = document.getElementById('notif-badge');
+      const currentCount = parseInt(badge.textContent, 10) || 0;
+      const newCount = currentCount + count;
+      badge.textContent = newCount;
+      if (newCount > 0) {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    async function loadNotifications() {
+      try {
+        const res = await fetch("http://127.0.0.1:3000/api/v1/notifications");
+        const data = await res.json();
+        if (data.success) {
+          const listEl = document.getElementById('notif-list');
+          const auth = getLoggedInUser();
+          const userId = auth?.user?._id;
+
+          // Lọc thông báo cho user này hoặc thông báo chung (userId === null)
+          const myNotifs = data.data.filter(n => n.userId === null || n.userId === userId);
+
+          if (myNotifs.length > 0) {
+            listEl.innerHTML = '';
+            myNotifs.forEach(n => addNotificationToList(n));
+            // Tạm thời set badge bằng số lượng thông báo (trong thực tế cần check trạng thái read)
+            updateNotifBadge(myNotifs.filter(n => !n.read).length);
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi tải thông báo:", err);
+      }
+    }
+
+    function createCampaignCard(campaign){
+
+        const card = document.createElement("div")
+
+        card.className =
+        "bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition"
+
+        card.innerHTML = `
+
+        <img src="${campaign.image || PLACEHOLDER_IMG}" 
+        class="w-full h-40 object-cover">
+
+        <div class="p-5">
+
+            <h4 class="font-bold text-lg mb-2">
+            ${campaign.title || ""}
+            </h4>
+
+            <p class="text-gray-500 text-sm mb-2">
+            <i class="fa-solid fa-building-ngo mr-2"></i>
+            ${campaign.organization || ""}
+            </p>
+
+            <p class="text-gray-600 text-sm mb-3">
+            ${campaign.des || ""}
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-3">
+
+                <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold uppercase">
+                ${campaign.skills || ""}
+                </span>
+
+                <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                ${campaign.vacancies || 0} TNV • ${campaign.timeline || ""}
+                </span>
+
+            </div>
+
+            <div class="flex gap-2">
+
+                <button onclick="viewDetail('${campaign.id}')"
+                class="flex-1 border-2 border-indigo-600 text-indigo-600 py-2 rounded-lg font-bold hover:bg-indigo-600 hover:text-white transition text-sm">
+                Chi tiết
+                </button>
+
+                <button onclick="applyNow('${campaign.id}')"
+                class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 transition text-sm">
+                Ứng tuyển
+                </button>
+
+            </div>
+
+        </div>
+        `
+
+        return card
+    }
+
+    function openProfile(){
+
+const auth = getLoggedInUser()
+if(!auth) return
+
+const user = auth.user
+
+document.getElementById("profileModal")
+.classList.remove("hidden")
+
+document.getElementById("profile-avatar")
+.innerText = (user.fullName || "TN")
+.substring(0,2)
+.toUpperCase()
+
+document.getElementById("profile-name")
+.innerText = user.fullName || ""
+
+document.getElementById("profile-points")
+.innerText = "⭐ " + (user.point || 0) + " điểm"
+
+document.getElementById("profile-bio")
+.value = user.bio || ""
+
+renderSkills(user.skills)
+renderBadges(user.point)
+loadActivityHistory(user)
+
+}
+
+function closeProfile(){
+
+document.getElementById("profileModal")
+.classList.add("hidden")
+
+}
+function renderSkills(skills){
+
+const box = document.getElementById("profile-skills")
+
+box.innerHTML = ""
+
+if(!skills) return
+
+const list = Array.isArray(skills) ? skills : skills.split(",")
+
+list.forEach(skill => {
+
+const tag = document.createElement("span")
+
+tag.className =
+"bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs flex items-center gap-1"
+
+tag.innerHTML = `
+${skill.trim()}
+<button onclick="removeSkill(this)"
+class="text-red-400 hover:text-red-600 font-bold ml-1">
+×
+</button>
+`
+
+box.appendChild(tag)
+
+})
+
+}
+function removeSkill(btn){
+
+const tag = btn.parentElement
+
+tag.remove()
+
+}
+function addSkill(){
+
+const input = document.getElementById("new-skill-input")
+const skill = input.value.trim()
+
+if(!skill) return
+
+const box = document.getElementById("profile-skills")
+
+const tag = document.createElement("span")
+
+tag.className =
+"bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs flex items-center gap-1"
+
+tag.innerHTML = `
+${skill}
+<button onclick="removeSkill(this)"
+class="text-red-500 font-bold ml-1">
+×
+</button>
+`
+
+box.appendChild(tag)
+
+input.value = ""
+
+}
+function renderBadges(point){
+
+const box = document.getElementById("profile-badges")
+
+box.innerHTML = ""
+
+if(point >= 50)
+box.innerHTML += "🥉 Bronze"
+
+if(point >= 100)
+box.innerHTML += " 🥈 Silver"
+
+if(point >= 200)
+box.innerHTML += " 🥇 Gold"
+
+}
+async function loadActivityHistory(user){
+
+const list = document.getElementById("profile-history")
+
+list.innerHTML = ""
+
+try{
+
+const data = await apiFetch("/candidates")
+
+    /* lọc theo tên user đang login */
+    const history = data.filter(c =>
+    (c.name || "").toLowerCase().trim() ===
+    (user.fullName || "").toLowerCase().trim()
+    )
+
+    if(history.length === 0){
+
+    list.innerHTML = `
+        <li class="text-gray-400">
+        Chưa có hoạt động nào
+        </li>`
+
+        return
+    }
+
+    history.forEach(c=>{
+
+        const li = document.createElement("li")
+
+        li.innerText =
+        `${c.campaign} - ${c.status}`
+
+        list.appendChild(li)
+
+        })
+
+    }catch(e){
+
+        console.error(e)
+
+    }
+
+}
+
+async function saveProfile(){
+
+    const auth = getLoggedInUser()
+    const user = auth.user
+
+    const bio = document.getElementById("profile-bio").value
+
+    const skills = [...document
+    .querySelectorAll("#profile-skills span")]
+    .map(s => s.childNodes[0].nodeValue.trim())
+    .join(",")
+
+    try{
+
+    const updatedUser = await apiFetch("/users/"+user._id,{
+    method:"PATCH",
+    headers:{Authorization:`Bearer ${auth.token}`},
+    body:JSON.stringify({bio,skills})
+    })
+
+    /* cập nhật lại sessionStorage */
+    auth.user = updatedUser
+    sessionStorage.setItem("sessionKey", JSON.stringify(auth))
+
+    /* cập nhật UI ngay */
+    renderSkills(updatedUser.skills)
+    renderBadges(updatedUser.point)
+
+    /* cập nhật avatar */
+    const avatar = document.getElementById("user-avatar")
+    avatar.innerText =
+    (updatedUser.fullName || "TN")
+    .substring(0,2)
+    .toUpperCase()
+
+    alert("Đã cập nhật hồ sơ")
+
+    }catch(e){
+
+    alert("Lỗi cập nhật")
+
+    }
+
+}
+
+/* =========================
+    RENDER CAMPAIGNS
+    ========================= */
+
+    function renderCampaignList(campaigns){
+
+        const list = document.getElementById("all-list")
+        if(!list) return
+
+        list.innerHTML=""
+
+        if(campaigns.length === 0){
+            list.innerHTML = `
+            <p class="col-span-full text-center text-gray-400 py-10">
+            Không có chiến dịch phù hợp
+            </p>`
+            return
+        }
+
+        campaigns.forEach(campaign => {
+
+            const card = createCampaignCard(campaign)
+
+            card.className =
+            "bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition"
+
+            card.innerHTML = `
+
+            <img src="${campaign.image || PLACEHOLDER_IMG}" 
+            class="w-full h-40 object-cover">
+
+            <div class="p-5">
+
+                <h4 class="font-bold text-lg mb-2">
+                ${campaign.title || ""}
+                </h4>
+
+                <p class="text-gray-500 text-sm mb-2">
+                <i class="fa-solid fa-building-ngo mr-2"></i>
+                ${campaign.organization || ""}
+                </p>
+
+                <p class="text-gray-600 text-sm mb-3">
+                ${campaign.des || ""}
+                </p>
+
+                <div class="flex flex-wrap gap-2 mb-3">
+
+                    <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold uppercase">
+                    ${campaign.skills || ""}
+                    </span>
+
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                    ${campaign.vacancies || 0} TNV • ${campaign.timeline || ""}
+                    </span>
+
+                </div>
+
+                <div class="flex gap-2">
+
+                    <button onclick="viewDetail('${campaign.id}')"
+                    class="flex-1 border-2 border-indigo-600 text-indigo-600 py-2 rounded-lg font-bold hover:bg-indigo-600 hover:text-white transition text-sm">
+                    Chi tiết
+                    </button>
+
+                    <button onclick="applyNow('${campaign.title}')"
+                    class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 transition text-sm">
+                    Ứng tuyển
+                    </button>
+
+                </div>
+
+            </div>
+            `
+
+            list.appendChild(card)
+
+        })
+
+    }
+
+    function renderSkillRecommendations(){
+
+        const box = document.getElementById("skill-recommend-list")
+
+        if(!box) return
+
+        const auth = getLoggedInUser()
+        if(!auth) {
+            box.innerHTML = `<p class="text-gray-400">Đăng nhập để xem gợi ý phù hợp</p>`
+            return
+        }
+
+        const user = auth.user
+        let userSkills = []
+        if (Array.isArray(user.skills)) {
+            userSkills = user.skills.map(s => String(s).toLowerCase().trim()).filter(Boolean)
+        } else {
+            userSkills = (user.skills || "")
+                .toLowerCase()
+                .split(",")
+                .map(s => s.trim())
+                .filter(Boolean)
+        }
+
+        if(!userSkills.length){
+            box.innerHTML = `
+            <p class="text-gray-400">
+            Chưa có kỹ năng trong hồ sơ của bạn
+            </p>`
+            return
+        }
+
+        const matched = allCampaigns.filter(c => {
+            
+            const campaignSkills = (c.skills || "")
+            .toLowerCase()
+            .split(",")
+            .map(s => s.trim())
+
+            console.log("userSkills:", userSkills)
+            console.log("campaignSkills:", campaignSkills)
+            
+            return userSkills.some(skill =>
+                campaignSkills.includes(skill)
+            )
+
+        })
+
+
+        if(matched.length === 0){
+
+            box.innerHTML = `
+            <p class="text-gray-400">
+            Chưa có chiến dịch phù hợp với kỹ năng của bạn
+            </p>`
+
+            return
+        }
+
+        box.innerHTML = ""
+
+        matched.slice(0,3).forEach(c => {
+
+            const card = createCampaignCard(c)
+
+            box.appendChild(card)
+
+        })
+
+    }
+    /* =========================
+    FILTER CATEGORY
+    ========================= */
+
+    function filterByCategory(category){
+
+        // nếu chọn Tất cả
+        if(category === "All"){
+            currentCategory = null
+            renderCampaignList(allCampaigns)
+            return
+        }
+
+        currentCategory = category
+
+        const filtered = allCampaigns.filter(c =>
+            (c.category || "").toLowerCase() === category.toLowerCase()
+        )
+
+        renderCampaignList(filtered)
+
+    }
+
+
+    /* =========================
+    SEARCH
+    ========================= */
+
+    function applySearch(){
+
+        const q = document
+            .getElementById("search-input")
+            .value
+            .trim()
+            .toLowerCase()
+
+        let filtered = allCampaigns
+
+        // nếu đang chọn category thì filter trước
+        if(currentCategory){
+            filtered = filtered.filter(c =>
+                (c.category || "").toLowerCase() === currentCategory.toLowerCase()
+            )
+        }
+
+        // sau đó search
+        if(q){
+
+            filtered = filtered.filter(c =>
+
+                (c.title || "").toLowerCase().includes(q) ||
+                (c.skills || "").toLowerCase().includes(q) ||
+                (c.des || "").toLowerCase().includes(q)
+
+            )
+
+        }
+
+        renderCampaignList(filtered)
+
+    }
+
+    /* =========================
+    LOAD CAMPAIGNS
+    ========================= */
+
+    async function loadCampaigns(){
+
+        try{
+
+            const campaigns = await apiFetch("/campaigns")
+
+            allCampaigns = Array.isArray(campaigns)
+                ? campaigns
+                : []
+
+            renderCampaignList(allCampaigns)
+            renderSkillRecommendations()
+        }
+        catch(e){
+
+            console.error(e)
+
+            document.getElementById("all-list").innerHTML = `
+            <p class="col-span-full text-red-500 text-center py-8">
+            Không tải được danh sách chiến dịch
+            </p>`
+
+        }
+
+    }
+
+
+    /* =========================
+    VIEW DETAIL
+    ========================= */
+
+    function viewDetail(id){
+
+        window.location.href =
+        "activity-detail.html?id=" + encodeURIComponent(id)
+
+    }
+
+    /* =========================
+    APPLY
+    ========================= */
+
+    async function applyNow(title) {
+        console.log("campaign title:", title)
+console.log("all campaigns:", allCampaigns)
+    const auth = getLoggedInUser();
+
+    if (!auth) {
+        alert("Bạn cần đăng nhập");
+        return;
+    }
+
+    const user = auth.user;
+    console.log(user);
+    const name = (user.fullName || "").trim();
+    const email = (user.email || "").trim();
+    
+    // Xử lý skills: có thể là String hoặc Array
+    let skills = user.skills || "";
+    if (Array.isArray(skills)) {
+        skills = skills.join(", ");
+    }
+    skills = String(skills).trim();
+
+    if (!name) {
+        alert("Không lấy được tên người dùng");
+        return;
+    }
+
+    try {
+
+        await apiFetch("/candidates", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${auth.token}`
+            },
+            body: JSON.stringify({
+                name: name,
+                skills: skills,
+                campaign: title,
+                status: "Pending",
+                email: email,
+                userId: user._id
+            })
+        });
+
+        alert("Ứng tuyển thành công");
+
+    } catch (e) {
+        console.error(e);
+        alert(e.message || "Gửi đơn thất bại");
+    }
+}
+
+/* =========================
+    AUTH & UI
+    ========================= */
+
+    function updateUI() {
+        const auth = getLoggedInUser()
+        const btnLogin = document.getElementById("btn-login")
+        const btnLogout = document.getElementById("logout-btn")
+        const avatar = document.getElementById("user-avatar")
+
+        if (auth && auth.user) {
+            btnLogin?.classList.add("hidden")
+            btnLogout?.classList.remove("hidden")
+            avatar?.classList.remove("hidden")
+            avatar.innerText = (auth.user.fullName || "TN").substring(0, 2).toUpperCase()
+            avatar.title = auth.user.fullName
+        } else {
+            btnLogin?.classList.remove("hidden")
+            btnLogout?.classList.add("hidden")
+            avatar?.classList.add("hidden")
+        }
+    }
+
+    function logout() {
+        sessionStorage.removeItem("sessionKey")
+        window.location.href = "/login"
+    }
+
+/* =========================
+    INIT
+    ========================= */
+
+    document.addEventListener("DOMContentLoaded", async () => {
+         updateUI()
+         await loadCampaigns()
+         initSocket()
+         loadNotifications() // Tải danh sách thông báo đã có
+
+         const search = document.getElementById("search-input")
+
+         if(search){
+             search.addEventListener("input", applySearch)
+         }
+
+         // Logic cho thông báo
+         const notifBtn = document.getElementById("notif-btn");
+         const notifPopup = document.getElementById("notif-popup");
+
+         notifBtn?.addEventListener("click", (e) => {
+             e.stopPropagation();
+             notifPopup?.classList.toggle("hidden");
+             // Khi mở ra thì ẩn badge đi (coi như đã xem)
+             if (!notifPopup?.classList.contains("hidden")) {
+                const badge = document.getElementById('notif-badge');
+                badge.classList.add('hidden');
+                badge.textContent = '0';
+             }
+         });
+
+         document.addEventListener("click", (e) => {
+             if (!notifPopup?.contains(e.target) && e.target !== notifBtn) {
+                 notifPopup?.classList.add("hidden");
+             }
+         });
+
+         document.getElementById("clear-notif")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            document.getElementById('notif-list').innerHTML = '<p class="text-center text-gray-400 py-4 text-sm">Không có thông báo mới</p>';
+            document.getElementById('notif-badge').classList.add('hidden');
+            document.getElementById('notif-badge').textContent = '0';
+         });
+
+         document.querySelectorAll(".category-card")
+        .forEach(card => {
+
+            card.addEventListener("click", () => {
+
+                const category = card.dataset.category
+
+                filterByCategory(category)
+
+            })
+
+        })
+
+    })
+
+    </script>
+
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+
+<div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-6">
+
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold">Hồ sơ cá nhân</h2>
+<button onclick="closeProfile()" class="text-gray-500">
+<i class="fa-solid fa-xmark text-xl"></i>
+</button>
+</div>
+
+<div class="flex gap-6">
+
+<!-- LEFT -->
+<div class="w-1/3 text-center">
+
+<div id="profile-avatar"
+class="w-28 h-28 rounded-full bg-indigo-100
+flex items-center justify-center text-3xl
+font-bold text-indigo-600 mx-auto">
+TN
+</div>
+
+<h3 id="profile-name" class="mt-4 font-bold text-lg"></h3>
+
+<p id="profile-points"
+class="text-sm text-gray-500 mt-1">
+⭐ 0 điểm
+</p>
+
+</div>
+
+
+<!-- RIGHT -->
+<div class="flex-1 space-y-5">
+
+<!-- BIO -->
+<div>
+
+<label class="text-sm font-semibold">
+Bio
+</label>
+
+<textarea id="profile-bio"
+class="w-full mt-2 border rounded-lg p-2"
+rows="3"
+placeholder="Giới thiệu bản thân..."></textarea>
+
+</div>
+
+
+<!-- SKILLS -->
+<div>
+
+<label class="text-sm font-semibold">
+Kỹ năng
+</label>
+
+<div id="profile-skills"
+class="flex flex-wrap gap-2 mt-2">
+</div>
+
+<input id="new-skill-input"
+placeholder="Thêm skill..."
+class="border rounded-lg px-3 py-1 mt-2 text-sm">
+
+<button onclick="addSkill()"
+class="ml-2 bg-indigo-600 text-white px-3 py-1 rounded text-sm">
+Thêm
+</button>
+
+</div>
+
+
+<!-- BADGES -->
+<div>
+
+<label class="text-sm font-semibold">
+Huy hiệu
+</label>
+
+<div id="profile-badges"
+class="flex gap-2 mt-2 text-sm">
+</div>
+
+</div>
+
+
+<!-- HISTORY -->
+<div>
+
+<label class="text-sm font-semibold">
+Lịch sử hoạt động
+</label>
+
+<ul id="profile-history"
+class="list-disc ml-5 text-sm mt-2 text-gray-600">
+</ul>
+
+</div>
+
+<button onclick="saveProfile()"
+class="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+Lưu hồ sơ
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

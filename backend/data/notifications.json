@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "1773066315426",
+    "message": "Chúc mừng! Bạn đã được duyệt tham gia chiến dịch \"Hiến máu nhân đạo\".",
+    "link": "#",
+    "createdAt": "2026-03-09T14:25:15.426Z",
+    "read": false,
+    "userId": "1773033580021"
+  },
+  {
+    "_id": "1773066314155",
+    "message": "Chúc mừng! Bạn đã được duyệt tham gia chiến dịch \"Tổ chức lớp học STEM cuối tuần\".",
+    "link": "#",
+    "createdAt": "2026-03-09T14:25:14.155Z",
+    "read": false,
+    "userId": "1773033580021"
+  },
+  {
+    "_id": "1773066312290",
+    "message": "Chúc mừng! Bạn đã được duyệt tham gia chiến dịch \"Tổ chức lớp học STEM cuối tuần\".",
+    "link": "#",
+    "createdAt": "2026-03-09T14:25:12.290Z",
+    "read": false,
+    "userId": "1772988495008"
+  },
+  {
+    "_id": "1773066297645",
+    "message": "Chiến dịch mới đã được tạo: \"Dạy Tiếng Anh Giao Tiếp Cho Trẻ Em Vùng Ngoại Thành\"",
+    "link": "/activity-detail.html?id=1773066297644",
+    "createdAt": "2026-03-09T14:24:57.645Z",
+    "read": false,
+    "userId": null
+  },
+  {
+    "_id": "1773066049056",
+    "message": "Chúc mừng! Bạn đã được duyệt tham gia chiến dịch \"Hỗ trợ người nước ngoài làm quen với văn hóa việt\".",
+    "link": "#",
+    "createdAt": "2026-03-09T14:20:49.056Z",
+    "read": false,
+    "userId": "1772988495008"
+  },
+  {
+    "_id": "1773065925290",
+    "message": "Chiến dịch mới đã được tạo: \"Hỗ trợ người nước ngoài làm quen với văn hóa việt\"",
+    "link": "/activity-detail.html?id=1773065925289",
+    "createdAt": "2026-03-09T14:18:45.290Z",
+    "read": false,
+    "userId": null
+  }
+]

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý ứng tuyển - Volunteer Matching</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <a href="volunteer-home.html" class="flex items-center gap-2">
+                <i class="fa-solid fa-hand-holding-heart text-indigo-600 text-2xl"></i>
+                <span class="font-bold text-xl">Volunteer Matching</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <span id="user-name" class="font-medium text-gray-700">Tình nguyện viên</span>
+                <button onclick="logout()" class="text-red-500 font-semibold hover:text-red-600">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Quản lý ứng tuyển của bạn</h1>
+            <a href="volunteer-home.html" class="text-indigo-600 hover:underline text-sm font-medium">
+                <i class="fa-solid fa-plus mr-1"></i> Tìm thêm công việc
+            </a>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-xl overflow-hidden">
+            <button onclick="switchTab('pending')" id="tab-pending" class="flex-1 py-4 font-bold text-sm uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition">
+                Chờ duyệt
+            </button>
+            <button onclick="switchTab('upcoming')" id="tab-upcoming" class="flex-1 py-4 font-bold text-sm uppercase tracking-wider border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition">
+                Sắp diễn ra
+            </button>
+            <button onclick="switchTab('completed')" id="tab-completed" class="flex-1 py-4 font-bold text-sm uppercase tracking-wider border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition">
+                Đã hoàn thành
+            </button>
+        </div>
+
+        <!-- Content Lists -->
+        <div id="list-container" class="space-y-4">
+            <div class="text-center py-12 text-gray-400 italic">Đang tải dữ liệu...</div>
+        </div>
+    </main>
+
+    <!-- QR Modal -->
+    <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <h3 class="text-xl font-bold mb-2">Mã QR Điểm danh</h3>
+            <p class="text-gray-500 text-sm mb-6">Đưa mã này cho ban tổ chức để thực hiện điểm danh khi đến nơi.</p>
+            
+            <div id="qrcode" class="flex justify-center mb-6 p-4 bg-white border-4 border-indigo-50 rounded-2xl"></div>
+            
+            <p id="qr-campaign-title" class="font-bold text-indigo-600 mb-6"></p>
+
+            <button onclick="closeQRModal()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:3000/api/v1/org";
+        const SESSION_KEY = "sessionKey";
+        let allApplications = [];
+        let currentTab = 'pending';
+
+        function getSession() {
+            try {
+                const raw = sessionStorage.getItem(SESSION_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) { return null; }
+        }
+
+        function logout() {
+            sessionStorage.removeItem(SESSION_KEY);
+            window.location.href = "/login";
+        }
+
+        async function fetchApplications() {
+            const session = getSession();
+            if (!session || !session.user) {
+                window.location.href = "/login";
+                return;
+            }
+
+            document.getElementById('user-name').textContent = session.user.fullName || "Tình nguyện viên";
+
+            try {
+                const res = await fetch(`${API_BASE}/candidates/me/${session.user._id}`);
+                const data = await res.json();
+                
+                if (data.success) {
+                    allApplications = data.data;
+                    renderList();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('list-container').innerHTML = `
+                    <div class="bg-red-50 text-red-600 p-4 rounded-xl text-center border border-red-100">
+                        Không thể tải danh sách ứng tuyển. Vui lòng thử lại sau.
+                    </div>
+                `;
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update UI
+            ['pending', 'upcoming', 'completed'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tab) {
+                    btn.classList.add('border-indigo-600', 'text-indigo-600');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    btn.classList.remove('border-indigo-600', 'text-indigo-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+
+            renderList();
+        }
+
+        function renderList() {
+            const container = document.getElementById('list-container');
+            let filtered = [];
+
+            if (currentTab === 'pending') {
+                filtered = allApplications.filter(app => app.status === 'Pending');
+            } else if (currentTab === 'upcoming') {
+                filtered = allApplications.filter(app => app.status === 'Approved' && (!app.campaignDetail || !app.campaignDetail.is_finish));
+            } else if (currentTab === 'completed') {
+                filtered = allApplications.filter(app => app.status === 'Approved' && app.campaignDetail && app.campaignDetail.is_finish);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-12 rounded-2xl text-center shadow-sm border border-gray-100">
+                        <div class="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-folder-open text-gray-300 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">Không có ứng tuyển nào trong mục này.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(app => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition">
+                    <div class="flex items-start gap-4">
+                        <div class="w-16 h-16 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                            <i class="fa-solid fa-calendar-check text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">${app.campaign}</h3>
+                            <p class="text-gray-500 text-sm flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-location-dot"></i>
+                                ${app.campaignDetail?.location || 'Địa điểm chưa cập nhật'}
+                            </p>
+                            <p class="text-gray-400 text-xs mt-1">Hạn: ${app.campaignDetail?.timeline || '—'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        ${currentTab === 'upcoming' ? `
+                            <button onclick="showQR('${app.id}', '${app.campaign}')" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition flex items-center gap-2">
+                                <i class="fa-solid fa-qrcode"></i>
+                                Điểm danh
+                            </button>
+                        ` : ''}
+                        
+                        ${app.status === 'Pending' ? `
+                            <span class="bg-yellow-50 text-yellow-600 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
+                                Đang chờ duyệt
+                            </span>
+                        ` : ''}
+                        
+                        ${currentTab === 'completed' ? `
+                            <span class="bg-green-50 text-green-600 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <i class="fa-solid fa-circle-check mr-1"></i> Đã hoàn thành
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let qrcode = null;
+
+        function showQR(candidateId, campaignTitle) {
+            const modal = document.getElementById('qr-modal');
+            const qrContainer = document.getElementById('qrcode');
+            const titleEl = document.getElementById('qr-campaign-title');
+            
+            qrContainer.innerHTML = '';
+            titleEl.textContent = campaignTitle;
+            
+            // Create QR code
+            // Data format: { type: 'attendance', candidateId: '...' }
+            const qrData = JSON.stringify({
+                type: 'attendance',
+                candidateId: candidateId,
+                timestamp: Date.now()
+            });
+
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 200,
+                height: 200,
+                colorDark : "#4f46e5", // indigo-600
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeQRModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('qr-modal');
+            if (event.target == modal) {
+                closeQRModal();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchApplications);
+    </script>
+</body>
+</html>

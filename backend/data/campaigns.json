@@ -1,0 +1,232 @@
+[
+  {
+    "id": "1773066297644",
+    "title": "Dạy Tiếng Anh Giao Tiếp Cho Trẻ Em Vùng Ngoại Thành",
+    "des": "Chương trình tình nguyện hỗ trợ dạy tiếng Anh giao tiếp cơ bản cho học sinh tiểu học và THCS tại khu vực ngoại thành Hà Nội.",
+    "description": "Chiến dịch nhằm kết nối các tình nguyện viên có khả năng tiếng Anh với học sinh tại các khu vực còn hạn chế về điều kiện học tập.",
+    "category": "Education",
+    "image": "https://images.unsplash.com/photo-1509062522246-3755977927d7",
+    "skills": "làm 2h/tuần, có khả năng sư phạm tiếng anh, thích làm việc với trẻ em",
+    "vacancies": 10,
+    "timeline": "23.12.2026 - 30.12.2026",
+    "location": "Hà Nội",
+    "organization": "Volunteer Educations Việt Nam",
+    "organization_id": "",
+    "TNV_ids": [],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  },
+  {
+    "id": "1773065925289",
+    "title": "Hỗ trợ người nước ngoài làm quen với văn hóa việt",
+    "des": "Dẫn khách nước ngoài đi thăm quan",
+    "description": "Chọn một địa điểm bạn cảm thấy thú vị nhất để đưa khách du lịch thăm quan, học hỏi và làm quen với người bản địa.",
+    "category": "Education",
+    "image": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Dạy học, giao tiếp tốt, ứng xử nhanh nhẹn, khả năng học hỏi nhanh, có kinh nghiệm là việc với người nước ngoài",
+    "vacancies": 15,
+    "timeline": "23.12.2026 - 30.12.2026",
+    "location": "Tùy ý",
+    "organization": "LanEdu Orgs",
+    "organization_id": "",
+    "TNV_ids": [
+      "1772988495008"
+    ],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  },
+  {
+    "id": "1772993904231",
+    "title": "Hỗ trợ đồng bào vùng sâu vùng xa",
+    "organization": "NGO Hà Nội",
+    "des": "Xây dựng tàn phá của bão, đóng góp, ủng hộ",
+    "description": "Đội ngũ sinh viên trẻ tham gia vào đóng góp chống lũ lụt vùng sâu vùng xa giúp trẻ em khôi phục lại môi trường phát triển",
+    "category": "Environment",
+    "image": "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Dạy học, giao tiếp tốt, ứng xử nhanh nhẹn",
+    "vacancies": 18,
+    "timeline": "23.12.2026 - 30.12.2026",
+    "location": "",
+    "organization_id": "",
+    "TNV_ids": [
+      "",
+      "1773033580021"
+    ],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001001",
+    "title": "Trồng rừng bảo vệ môi trường",
+    "organization": "Green Earth Vietnam",
+    "des": "Tham gia trồng cây gây rừng tại khu vực đồi trọc.",
+    "description": "Chiến dịch nhằm phục hồi hệ sinh thái và nâng cao ý thức bảo vệ môi trường cho cộng đồng địa phương.",
+    "category": "Environment",
+    "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Teamwork, Physical Work",
+    "vacancies": 19,
+    "timeline": "2026-03-20 đến 2026-03-22",
+    "location": "Sapa, Vietnam",
+    "organization_id": "u100",
+    "TNV_ids": [
+      "u201",
+      "u202",
+      "1772988495008"
+    ],
+    "is_active": true,
+    "apply_status": "Approved",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001002",
+    "title": "Thu gom rác bãi biển",
+    "organization": "Green Earth Vietnam",
+    "des": "Làm sạch bãi biển và tuyên truyền bảo vệ môi trường.",
+    "description": "Tình nguyện viên tham gia thu gom rác và tuyên truyền nâng cao nhận thức về bảo vệ đại dương.",
+    "category": "Environment",
+    "image": "https://images.unsplash.com/photo-1621451537084-482c73073a0f?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Teamwork",
+    "vacancies": 29,
+    "timeline": "2026-03-25",
+    "location": "Da Nang, Vietnam",
+    "organization_id": "u100",
+    "TNV_ids": [
+      "u203",
+      "1772988495008"
+    ],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001003",
+    "title": "Dạy lập trình Scratch cho trẻ em",
+    "organization": "Tech Future Foundation",
+    "des": "Giúp trẻ em làm quen với lập trình Scratch.",
+    "description": "Tình nguyện viên sẽ hướng dẫn học sinh tiểu học học lập trình thông qua nền tảng Scratch.",
+    "category": "Technology",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Scratch, Teaching",
+    "vacancies": 10,
+    "timeline": "2026-04-01 đến 2026-04-10",
+    "location": "Hanoi, Vietnam",
+    "organization_id": "u101",
+    "TNV_ids": [
+      "u204",
+      "1772988495008"
+    ],
+    "is_active": true,
+    "apply_status": "Approved",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001004",
+    "title": "Workshop kỹ năng AI cơ bản",
+    "organization": "Tech Future Foundation",
+    "des": "Giới thiệu kiến thức AI cho học sinh.",
+    "description": "Workshop giúp học sinh trung học tiếp cận các khái niệm cơ bản về trí tuệ nhân tạo.",
+    "category": "Technology",
+    "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Python, AI Basics",
+    "vacancies": 6,
+    "timeline": "2026-04-15",
+    "location": "Ho Chi Minh City, Vietnam",
+    "organization_id": "u101",
+    "TNV_ids": [
+      "1772988495008",
+      "1773033580021"
+    ],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001005",
+    "title": "Hiến máu nhân đạo",
+    "organization": "Health For All",
+    "des": "Ngày hội hiến máu vì cộng đồng.",
+    "description": "Chương trình hiến máu nhằm hỗ trợ nguồn máu cho các bệnh viện trong khu vực.",
+    "category": "Healthcare",
+    "image": "https://images.unsplash.com/photo-1615461066159-fea0960485d5?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Medical Support, Organization",
+    "vacancies": 49,
+    "timeline": "2026-03-30",
+    "location": "Hai Phong, Vietnam",
+    "organization_id": "u102",
+    "TNV_ids": [
+      "u201",
+      "u205",
+      "1772988495008",
+      null,
+      "1773033580021"
+    ],
+    "is_active": true,
+    "apply_status": "Approved",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001006",
+    "title": "Khám sức khỏe miễn phí",
+    "organization": "Health For All",
+    "des": "Hỗ trợ khám sức khỏe cho người dân vùng sâu.",
+    "description": "Các tình nguyện viên hỗ trợ đội ngũ bác sĩ trong chương trình khám bệnh miễn phí.",
+    "category": "Healthcare",
+    "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1350&q=80",
+    "skills": "Medical Assistance",
+    "vacancies": 14,
+    "timeline": "2026-04-05",
+    "location": "Ha Giang, Vietnam",
+    "organization_id": "u102",
+    "TNV_ids": [
+      "1773033580021"
+    ],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001007",
+    "title": "Dạy tiếng Anh cho trẻ em nông thôn",
+    "organization": "Future Education Vietnam",
+    "des": "Hỗ trợ dạy tiếng Anh cho học sinh tiểu học.",
+    "description": "Tình nguyện viên tham gia giảng dạy tiếng Anh cơ bản cho trẻ em vùng nông thôn.",
+    "category": "Education",
+    "image": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1350&q=80",
+    "skills": "English, Teaching",
+    "vacancies": 12,
+    "timeline": "2026-04-10 đến 2026-04-20",
+    "location": "Thai Binh, Vietnam",
+    "organization_id": "u103",
+    "TNV_ids": [
+      "u201",
+      "1773033580021"
+    ],
+    "is_active": true,
+    "apply_status": "Approved",
+    "is_finish": false
+  },
+  {
+    "id": "1700000001008",
+    "title": "Tổ chức lớp học STEM cuối tuần",
+    "organization": "Future Education Vietnam",
+    "des": "Lớp học STEM thực hành cho học sinh.",
+    "description": "Chương trình giúp học sinh tiếp cận khoa học và công nghệ thông qua các hoạt động thực hành thú vị.",
+    "category": "Education",
+    "image": "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1350&q=80",
+    "skills": "STEM, Teaching, Creativity",
+    "vacancies": 10,
+    "timeline": "2026-04-12",
+    "location": "Hanoi, Vietnam",
+    "organization_id": "u103",
+    "TNV_ids": [
+      "1772988495008",
+      "1773033580021"
+    ],
+    "is_active": true,
+    "apply_status": "Pending",
+    "is_finish": false
+  }
+]

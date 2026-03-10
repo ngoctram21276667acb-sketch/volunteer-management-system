@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin nhắn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex h-screen">
+        <!-- Sidebar: Conversation List -->
+        <div class="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h1 class="text-xl font-bold">Tin nhắn</h1>
+                <button onclick="openNewChatModal()" class="text-indigo-600 hover:text-indigo-800" title="Tin nhắn mới">
+                    <i class="fa-solid fa-plus-circle text-2xl"></i>
+                </button>
+            </div>
+            <div id="conversation-list" class="overflow-y-auto flex-1"></div>
+        </div>
+
+        <!-- New Chat Modal -->
+        <div id="new-chat-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl w-96 max-h-[80vh] flex flex-col shadow-2xl">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="font-bold text-lg">Bắt đầu cuộc trò chuyện</h3>
+                    <button onclick="closeNewChatModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+                        <input id="user-search-input" type="text" placeholder="Tìm tên hoặc email..." 
+                               class="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div id="user-search-results" class="flex-1 overflow-y-auto p-2">
+                    <!-- Kết quả tìm kiếm sẽ hiện ở đây -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div id="chat-area" class="w-2/3 flex flex-col bg-gray-50">
+            <!-- Chat Header -->
+            <div id="chat-header" class="p-4 border-b border-gray-200 bg-white flex items-center gap-3 hidden">
+                <div id="recipient-avatar" class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600"></div>
+                <h2 id="recipient-name" class="text-lg font-semibold"></h2>
+            </div>
+
+            <!-- Messages -->
+            <div id="message-list" class="flex-1 p-4 overflow-y-auto"></div>
+
+            <!-- Message Input -->
+            <div class="p-4 bg-white border-t border-gray-200">
+                <div class="flex items-center">
+                    <input id="message-input" type="text" placeholder="Nhập tin nhắn..." class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button id="send-button" class="ml-3 bg-indigo-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-indigo-700">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Placeholder for when no chat is selected -->
+        <div id="placeholder" class="w-2/3 flex items-center justify-center bg-gray-50">
+            <div class="text-center text-gray-500">
+                <i class="fa-regular fa-comments text-5xl mb-4"></i>
+                <p>Chọn một cuộc trò chuyện để bắt đầu</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const API_BASE = "http://127.0.0.1:3000/api/v1";
+        let state = {
+            currentUser: null,
+            conversations: [],
+            messages: [],
+            socket: null,
+            activeConversationId: null,
+            allUsers: [], // Lưu danh sách tất cả user để tìm kiếm
+        };
+
+        // UTILS
+        const $ = id => document.getElementById(id);
+
+        const getUserId = (user) => user?._id || user?.id;
+
+        function getSession() {
+            try {
+                const raw = sessionStorage.getItem("sessionKey");
+                if (!raw) return null;
+                const session = JSON.parse(raw);
+                return (session && session.token) ? session : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function apiFetch(path, options = {}) {
+            const session = getSession();
+            const headers = {
+                "Content-Type": "application/json",
+                ...(session && { "Authorization": `Bearer ${session.token}` }),
+                ...options.headers,
+            };
+            const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || `HTTP Error ${res.status}`);
+            return data.data;
+        }
+
+        // RENDER FUNCTIONS
+        function renderConversations() {
+            const listEl = $('conversation-list');
+            listEl.innerHTML = state.conversations.map(conv => `
+                <div class="p-4 cursor-pointer hover:bg-gray-100 border-b border-gray-200" onclick="selectConversation('${conv._id}')">
+                    <p class="font-semibold">${conv.recipient?.fullName || 'Người dùng'}</p>
+                    <p class="text-sm text-gray-500 truncate">${conv.lastMessage || "Bắt đầu cuộc trò chuyện"}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderMessages() {
+            const listEl = $('message-list');
+            listEl.innerHTML = state.messages.map(msg => {
+                const isMine = String(msg.senderId) === String(getUserId(state.currentUser));
+                return `
+                    <div class="flex ${isMine ? 'justify-end' : 'justify-start'} mb-3">
+                        <div class="px-4 py-2 rounded-lg max-w-lg ${isMine ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm'}">
+                            ${msg.text}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            listEl.scrollTop = listEl.scrollHeight;
+        }
+
+        // LOGIC
+        async function selectConversation(conversationId) {
+            state.activeConversationId = conversationId;
+            $('placeholder').classList.add('hidden');
+            $('chat-area').classList.remove('hidden');
+
+            const activeConv = state.conversations.find(c => c._id === conversationId);
+            if (!activeConv) return;
+            $('recipient-name').innerText = activeConv.recipient?.fullName || 'Người dùng';
+            $('recipient-avatar').innerText = (activeConv.recipient?.fullName || 'N').charAt(0).toUpperCase();
+            $('chat-header').classList.remove('hidden');
+
+            try {
+                const messages = await apiFetch(`/chat/messages/${conversationId}`);
+                state.messages = messages;
+                renderMessages();
+            } catch (error) {
+                console.error("Failed to load messages:", error);
+                alert(error.message);
+            }
+        }
+
+        function sendMessage() {
+            const input = $('message-input');
+            const text = input.value.trim();
+            if (!text || !state.activeConversationId || !state.socket) return;
+
+            const newMessage = {
+                _id: Date.now().toString(),
+                conversationId: state.activeConversationId,
+                text: text,
+                senderId: getUserId(state.currentUser),
+                createdAt: new Date().toISOString()
+            };
+
+            // Render ngay để người dùng thấy
+            state.messages.push(newMessage);
+            renderMessages();
+
+            state.socket.emit('message:send', {
+                conversationId: state.activeConversationId,
+                text: text,
+            });
+
+            input.value = '';
+        }
+
+        /* NEW CHAT MODAL LOGIC */
+        function openNewChatModal() {
+            $('new-chat-modal').classList.remove('hidden');
+            $('user-search-input').focus();
+            loadAllUsersForSearch();
+        }
+
+        function closeNewChatModal() {
+            $('new-chat-modal').classList.add('hidden');
+            $('user-search-input').value = '';
+            $('user-search-results').innerHTML = '';
+        }
+
+        async function loadAllUsersForSearch() {
+            try {
+                // Sử dụng API chung trả về tất cả users
+                const res = await fetch(`${API_BASE}/users`);
+                const data = await res.json();
+                const myId = String(getUserId(state.currentUser));
+                // Filter bỏ chính mình ra khỏi danh sách
+                state.allUsers = (data || []).filter(u => String(u._id || u.id) !== myId);
+                renderUserSearchResults('');
+            } catch (err) {
+                console.error("Lỗi tải users:", err);
+            }
+        }
+
+        function renderUserSearchResults(query) {
+            const resultsEl = $('user-search-results');
+            const filtered = state.allUsers.filter(u => 
+                (u.fullName || '').toLowerCase().includes(query.toLowerCase()) ||
+                (u.email || '').toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                resultsEl.innerHTML = '<p class="text-center text-gray-400 py-4">Không tìm thấy người dùng nào</p>';
+                return;
+            }
+
+            resultsEl.innerHTML = filtered.map(u => `
+                <div class="p-3 flex items-center gap-3 hover:bg-gray-100 rounded-lg cursor-pointer" 
+                     onclick="startNewChat('${u._id}')">
+                    <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600">
+                        ${(u.fullName || ' ').charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm">${u.fullName}</p>
+                        <p class="text-xs text-gray-500">${u.role === 'organization' ? 'Tổ chức' : 'Tình nguyện viên'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function startNewChat(recipientId) {
+            try {
+                const conv = await apiFetch('/chat/conversations', {
+                    method: 'POST',
+                    body: JSON.stringify({ recipientId })
+                });
+                
+                // Sau khi tạo xong, tải lại list conv và mở conv mới
+                const conversations = await apiFetch('/chat/conversations');
+                state.conversations = conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                renderConversations();
+                
+                closeNewChatModal();
+                selectConversation(conv._id);
+            } catch (err) {
+                console.error("Lỗi tạo hội thoại:", err);
+                alert("Không thể bắt đầu cuộc trò chuyện");
+            }
+        }
+
+        // INIT
+        async function init() {
+            const session = getSession();
+            if (!session) {
+                window.location.href = '/login';
+                return;
+            }
+            state.currentUser = session.user;
+
+            // Hide placeholder, show chat
+            $('placeholder').classList.add('hidden');
+            $('chat-area').classList.remove('hidden');
+
+            // Connect to socket
+            state.socket = io("http://127.0.0.1:3000", {
+                auth: { token: session.token },
+            });
+
+            state.socket.on('connect', () => console.log("Socket connected!"));
+            state.socket.on('disconnect', () => console.log("Socket disconnected!"));
+            state.socket.on('message:receive', (newMessage) => {
+                console.log("New message received:", newMessage);
+                
+                // Update conversation list
+                const convIndex = state.conversations.findIndex(c => String(c._id) === String(newMessage.conversationId));
+                if (convIndex !== -1) {
+                    state.conversations[convIndex].lastMessage = newMessage.text;
+                    state.conversations[convIndex].updatedAt = newMessage.createdAt;
+                    // Move to top
+                    const updatedConv = state.conversations.splice(convIndex, 1)[0];
+                    state.conversations.unshift(updatedConv);
+                    renderConversations();
+                }
+
+                // Add message to active chat
+                if (String(newMessage.conversationId) === String(state.activeConversationId)) {
+                    // Tránh duplicate nếu socket gửi lại tin nhắn của chính mình
+                    const exists = state.messages.find(m => m._id === newMessage._id);
+                    if (!exists) {
+                        state.messages.push(newMessage);
+                        renderMessages();
+                    }
+                }
+            });
+
+            // Load conversations
+            try {
+                const conversations = await apiFetch('/chat/conversations');
+                state.conversations = conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                renderConversations();
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const convIdFromUrl = urlParams.get('convId');
+                if (convIdFromUrl) {
+                    selectConversation(convIdFromUrl);
+                } else {
+                    // Initially, no chat is selected
+                    $('chat-area').classList.add('hidden');
+                    $('placeholder').classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error("Failed to load conversations:", error);
+                alert(error.message);
+            }
+
+            // Event Listeners
+            $('send-button').addEventListener('click', sendMessage);
+            $('message-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            // Search users in new chat modal
+            $('user-search-input').addEventListener('input', (e) => {
+                renderUserSearchResults(e.target.value);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>

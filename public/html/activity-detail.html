@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết hoạt động</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+        <a href="volunteer-home.html" class="text-indigo-600 font-semibold mb-4 inline-block italic">← Quay lại danh sách</a>
+
+        <div id="loading" class="text-center py-12 text-gray-500">Đang tải...</div>
+        <div id="error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4">Không tìm thấy chiến dịch.</div>
+
+        <div id="campaign-detail" class="hidden bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100">
+            <img id="detail-image" src="-" class="w-full h-72 object-cover" alt="">
+            <div class="p-8">
+                <div class="flex items-center gap-2 text-indigo-600 mb-2 font-medium uppercase tracking-wider text-sm">
+                    <i class="fa-solid fa-building-ngo"></i>
+                    <p id="detail-organization-name">-</p>
+                </div>
+                <h1 id="detail-title" class="text-3xl font-extrabold mb-6"></h1>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-gray-50 p-6 rounded-2xl">
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-calendar-day text-gray-400 mt-1"></i>
+                        <div><p class="font-bold">Hạn ứng tuyển</p><p id="detail-deadline" class="text-gray-600">—</p></div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-user-group text-gray-400 mt-1"></i>
+                        <div><p class="font-bold">Số lượng cần tuyển</p><p id="detail-vacancies" class="text-gray-600">—</p></div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="font-bold text-lg mb-4">Yêu cầu kỹ năng</h3>
+                    <div id="detail-skills" class="flex flex-wrap gap-3"></div>
+                </div>
+
+                <div class="mb-10 text-gray-600 leading-relaxed">
+                    <h3 class="font-bold text-black text-lg mb-2">Mô tả công việc</h3>
+                    <p id="detail-desc"></p>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="btn-apply" class="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
+                        Ứng tuyển ngay
+                    </button>
+                    <button id="btn-chat" class="flex-1 bg-gray-700 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition">
+                        Nhắn tin cho Tổ chức
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE = "http://127.0.0.1:3000/api/v1/org";
+        const USER_STORAGE_KEY = "sessionKey";
+        let currentCampaign = null;
+
+        function getLoggedInUser() {
+            try {
+                const raw = sessionStorage.getItem(USER_STORAGE_KEY);
+                if (!raw) return null;
+                const u = JSON.parse(raw);
+                return u && u.token ? u : null;
+            } catch (_) { return null; }
+        }
+
+        function getCampaignId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("id") || "";
+        }
+
+        async function apiFetch(path, options = {}) {
+
+            const headers = {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            };
+
+            const res = await fetch(`${API_BASE}${path}`, {
+                ...options,
+                headers
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok || data?.success === false) {
+                throw new Error(data?.message || "HTTP " + res.status);
+            }
+
+            return data?.data;
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+        }
+
+        async function loadCampaign() {
+            const id = getCampaignId();
+            const loading = document.getElementById("loading");
+            const error = document.getElementById("error");
+            const block = document.getElementById("campaign-detail");
+
+            if (!id) {
+                loading.classList.add("hidden");
+                error.classList.remove("hidden");
+                return;
+            }
+            try {
+                const campaigns = await apiFetch("/campaigns");
+                const campaign = (campaigns || []).find(c => String(c.id) === String(id));
+                loading.classList.add("hidden");
+                if (!campaign) {
+                    error.classList.remove("hidden");
+                    return;
+                }
+                currentCampaign = campaign;
+                error.classList.add("hidden");
+                block.classList.remove("hidden");
+
+                document.getElementById("detail-image").src = campaign.image || "-";
+                document.getElementById("detail-organization-name").textContent = campaign.organization || "—";
+                document.getElementById("detail-title").textContent = campaign.title || "—";
+                document.getElementById("detail-deadline").textContent = campaign.timeline || "—";
+                document.getElementById("detail-vacancies").textContent = String(campaign.vacancies ?? "—");
+                document.getElementById("detail-desc").textContent = campaign.description || "Chưa có mô tả.";
+
+                const skillsEl = document.getElementById("detail-skills");
+                skillsEl.innerHTML = "";
+                const skills = (campaign.skills || "").split(",").map(s => s.trim()).filter(Boolean);
+                if (skills.length === 0) skills.push("Theo yêu cầu chiến dịch");
+                skills.forEach(s => {
+                    const span = document.createElement("span");
+                    span.className = "bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full font-medium";
+                    span.textContent = s;
+                    skillsEl.appendChild(span);
+                });
+
+                document.getElementById("btn-apply").onclick = () => applyNow();
+                document.getElementById("btn-chat").onclick = () => startChatWithOrg();
+            } catch (e) {
+                console.error(e);
+                loading.classList.add("hidden");
+                error.classList.remove("hidden");
+                error.textContent = "Không tải được chi tiết. Kiểm tra kết nối hoặc backend.";
+            }
+        }
+
+async function applyNow() {
+
+    if (!currentCampaign) return;
+
+    const auth = getLoggedInUser();
+
+    if (!auth) {
+        alert("Bạn cần đăng nhập");
+        return;
+    }
+
+    const user = auth.user;
+    console.log(user);
+    const name = (user.fullName || "").trim();
+    const email = (user.email || "").trim();
+    const skills = (user.skills || "").trim();
+
+    if (!name) {
+        alert("Không lấy được tên người dùng");
+        return;
+    }
+
+    try {
+
+        await apiFetch("/candidates", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${auth.token}`
+            },
+            body: JSON.stringify({
+                name: name,
+                skills: skills,
+                campaign: currentCampaign.title,
+                status: "Pending",
+                email: email,
+                userId: user._id
+            })
+        });
+
+        alert("Ứng tuyển thành công");
+
+    } catch (e) {
+        console.error(e);
+        alert("Gửi đơn thất bại");
+    }
+}
+
+async function startChatWithOrg() {
+    const auth = getLoggedInUser();
+    if (!auth) {
+        alert("Bạn cần đăng nhập để nhắn tin.");
+        window.location.href = "/login";
+        return;
+    }
+
+    if (!currentCampaign || !currentCampaign.organizationId) {
+        alert("Không tìm thấy thông tin tổ chức để bắt đầu trò chuyện.");
+        return;
+    }
+
+    try {
+        // Sử dụng API đã tạo để tạo hoặc lấy cuộc trò chuyện
+        const conversation = await apiFetch("/chat/conversations", {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${auth.token}` },
+            body: JSON.stringify({ recipientId: currentCampaign.organizationId })
+        });
+        
+        // Chuyển hướng đến trang chat với ID cuộc trò chuyện
+        window.location.href = `chat.html?convId=${conversation.data._id}`;
+    } catch (error) {
+        console.error("Could not start chat:", error);
+        alert("Không thể bắt đầu cuộc trò chuyện. Vui lòng thử lại.");
+    }
+}
+
+        document.addEventListener("DOMContentLoaded", loadCampaign);
+        
+    </script>
+</body>
+</html>

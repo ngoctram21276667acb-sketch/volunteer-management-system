@@ -1,0 +1,64 @@
+[
+  {
+    "_id": "1773033580021",
+    "fullName": "Tôi la tôi",
+    "email": "tlt@123.com",
+    "password": "Toilatoi123!",
+    "phone": "1234567489",
+    "point": 0,
+    "role": "volunteer",
+    "skills": [
+      "Teaching",
+      "ITs",
+      "Speaking",
+      "Giao tiếp linh hoạt"
+    ],
+    "campaign_ids": [
+      "1772993904231",
+      "1700000001004",
+      "1700000001006"
+    ]
+  },
+  {
+    "_id": "1773032742436",
+    "fullName": "Người lạ ơi",
+    "email": "xinchotoimuonbovai@laqua.com",
+    "password": "Taikhoanthu123!",
+    "phone": "033311155544",
+    "point": 0,
+    "role": "volunteer",
+    "skills": [
+      "Teaching",
+      "ITs",
+      "Speaking",
+      "Giao tiếp linh hoạt"
+    ],
+    "campaign_ids": [
+      "1700000001001"
+    ]
+  },
+  {
+    "_id": "1772988754208",
+    "fullName": "VHV",
+    "email": "vhv@gmail.com",
+    "password": "Vhv123321!",
+    "role": "organization",
+    "skills": "IT"
+  },
+  {
+    "_id": "1773076465422",
+    "fullName": "Khoa đào tạo quốc tế dtu",
+    "email": "dtu123@gmail.com",
+    "password": "Ngoctram3011@",
+    "role": "organization",
+    "skills": "kinh tế"
+  },
+  {
+    "_id": "1773078566165",
+    "fullName": "Ngọc Trâm",
+    "email": "ngoctram03@gmail.com",
+    "password": "Ngoctram3011@",
+    "role": "volunteer",
+    "skills": "it"
+  }
+]
